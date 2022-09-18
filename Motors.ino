@@ -9,6 +9,7 @@
     based on Dejan Nedelkovski, www.HowToMechatronics.com
 */
 
+
 #define enA 13
 #define in1 12 
 #define in2 11
@@ -29,6 +30,12 @@ int motorSpeedB = 0;
 int motorSpeedC = 0;
 int motorSpeedD = 0;
 
+// Declaracion de variables globales
+float tempC; // Variable para almacenar el valor obtenido del sensor (0 a 1023)
+int pinLM35 = 7; // Variable del pin de entrada del sensor (A0)
+int led=48;
+int counter=0;
+
 void setup() {
   pinMode(enA, OUTPUT);
   pinMode(enB, OUTPUT);
@@ -44,9 +51,13 @@ void setup() {
   pinMode(in8, OUTPUT);
   pinMode(swj, INPUT);
 
+  Serial.begin(9600);
+  pinMode(48,OUTPUT);
 }
 
 void loop() {
+
+
   int xAxis = analogRead(A0);  // Read Joysticks X-axis
   int yAxis = analogRead(A1);  // Read Joysticks Y-axis
   //int turn  = digitalRead(22); // Read Joystick push button
@@ -119,6 +130,7 @@ void loop() {
     motorSpeedB = 0;
     motorSpeedC = 0;
     motorSpeedD = 0;
+    
   }
 
   // X-axis used for left and right control
@@ -180,6 +192,31 @@ void loop() {
   if (motorSpeedD < 70) {
     motorSpeedD = 0;
   }
+
+  counter=counter+1;
+  if(counter==10000){
+  
+    // Con analogRead leemos el sensor, recuerda que es un valor de 0 a 1023
+  tempC = analogRead(pinLM35); 
+   
+  // Calculamos la temperatura con la fórmula
+  tempC = (tempC*500.0)/1024.0; 
+
+  if (tempC<25){
+    digitalWrite(led,HIGH);
+    }
+  else{
+     digitalWrite(led,LOW);
+    }
+    
+  // Envia el dato al puerto serial
+  Serial.print(tempC);
+  // Salto de línea
+  Serial.print("\n");
+  counter=0;
+  }
+  // Esperamos un tiempo para repetir el loop
+  
   analogWrite(enA, motorSpeedA); // Send PWM signal to motor A
   analogWrite(enB, motorSpeedB); // Send PWM signal to motor B
   analogWrite(enC, motorSpeedC); // Send PWM signal to motor C
