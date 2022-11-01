@@ -1,0 +1,12 @@
+<!--
+  Used for visualising rplidar in action.  
+  
+  It requires rplidar.launch.
+ -->
+
+<launch>
+  <node pkg="rosserial_python" type="serial_node.py" args="/dev/ttyACM0" name="Arduino_serial" />
+  <include file="$(find rplidar_ros)/launch/view_rplidar.launch" />
+  <node pkg="beginner_tutorials" type="closest_follower.py" name="Follower"/>
+
+</launch>
